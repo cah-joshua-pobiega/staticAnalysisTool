@@ -1,0 +1,20 @@
+platform: linux
+
+image_resource:
+  type: docker-image
+  source:
+    repository: nexus-nonprod.cardinalhealth.net:8445/cathive/concourse-sonarqube-qualitygate-task
+    tag: latest # Use one of the versioned tags for reproducible builds!
+
+inputs:
+  - name: code-analysis
+  - name: project-source
+outputs:
+  - name: build-out
+
+run:
+  path: /sonarqube-qualitygate-check
+  dir: code-analysis
+
+params:
+  TERM: -dumb
