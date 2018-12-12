@@ -8,7 +8,7 @@ echo ${resource_dir}
 mkdir sonarqube-analysis-input/build
 mkdir sonarqube-analysis-input/build/jacoco
 mkdir build-out/version
-cd project-source/veracodeWrapper/
+cd project-source/ea_veracodeWrapper/
 
 #build veracodeWrapper
 ./gradlew clean build
