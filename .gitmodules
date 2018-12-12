@@ -1,0 +1,3 @@
+[submodule "ea_veracodewrapper"]
+	path = ea_veracodewrapper
+	url = https://joshua.pobiega@cardinalhealth.collab.net/gerrit/ea_veracodewrapper
