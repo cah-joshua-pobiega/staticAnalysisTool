@@ -68,14 +68,14 @@ resources:
       #project_key: com.example.my_project
 
 # Internal Nexus resource where to store build/binaries
-  - name: nexus-snapshot
-    type: maven-resource
-    source:
-     url: ((NEXUS_URL))
-     snapshot_url: ((NEXUS_SNAPSHOT_URL))
-     artifact: com.cardinalhealth:((appName)):jar   # ex: com.cardinalhealth.myfile:myfile:jar
-     username: ((NEXUS_USER))
-     password: ((NEXUS_PASSWORD))
+  # - name: nexus-snapshot
+  #   type: maven-resource
+  #   source:
+  #    url: ((NEXUS_URL))
+  #    snapshot_url: ((NEXUS_SNAPSHOT_URL))
+  #    artifact: com.cardinalhealth:((appName)):jar   # ex: com.cardinalhealth.myfile:myfile:jar
+  #    username: ((NEXUS_USER))
+  #    password: ((NEXUS_PASSWORD))
 
 # Internal Nexus resource for security tools
   - name: nexus-security-tools
