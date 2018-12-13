@@ -17,5 +17,5 @@ echo "Coping results"
 cp -R build/libs/staticAnalysisWrapper-*.jar ../../build-out
 cp -R ./* ../../sonarqube-analysis-input/
 # cp ./build/jacoco/* ../../sonarqube-analysis-input/build/jacoco
-echo "TEMP-SNAPSHOT" > ../../build-out/version/number
+# echo "TEMP-SNAPSHOT" > ../../build-out/version/number
 # echo "TEMP" > ../../build-out/version/number
