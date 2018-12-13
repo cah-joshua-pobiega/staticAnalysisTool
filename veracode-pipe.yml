@@ -1,4 +1,4 @@
-project-sourcegroups:
+groups:
 - name: ci-jobs
   jobs:
   - build-test-scan
@@ -37,7 +37,7 @@ resources:
       - version/
 
 # The GIT resource from where to pull the source code
-  - name: project-source
+  - name: pipeline-source
     type: git
     source:
       uri: ((GIT_PIPELINE_REPO))
@@ -109,7 +109,7 @@ jobs:
   - get: pipeline-source
   - aggregate:
     - task: build
-      file: pipe/ci/tasks/build.yml
+      file: project-source/ci/tasks/build.yml
       params:
         <<: *env-params
     # - task: test-scan
@@ -120,7 +120,7 @@ jobs:
  # put output in SonarQube resource for static analysis
   - put: code-analysis
     params:
-      project_path: project-source/
+      project_path: sonarqube-analysis-input
       additional_properties:
         #Will be passed as "-D<sonar property map> to the -uploadner.
         <<: *sonar-properties
@@ -210,4 +210,4 @@ sonar-properties: &sonar-properties
         sonar.sources: "."
         sonar.language: java
         sonar.sourceEncoding: UTF-8
-        sonar.jacoco.reportPaths: "build/jacoco/testCoverage.exec"
+        sonar.jacoco.reportPaths: "./build/jacoco/testCoverage.exec"
