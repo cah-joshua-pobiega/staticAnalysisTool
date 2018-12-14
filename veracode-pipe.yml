@@ -4,7 +4,7 @@ groups:
   - build-test-scan
   - check-dependencies
   - qualitygate
-  # - publish-snapshot
+  - publish-snapshot
 
 resource_types:
   # Performs SonarQube analyses and tracks the state of SonarQube quality gates
@@ -68,14 +68,14 @@ resources:
       #project_key: com.example.my_project
 
 # Internal Nexus resource where to store build/binaries
-  # - name: nexus-snapshot
-  #   type: maven-resource
-  #   source:
-  #    url: ((NEXUS_URL))
-  #    snapshot_url: ((NEXUS_SNAPSHOT_URL))
-  #    artifact: com.cardinalhealth:((appName)):jar   # ex: com.cardinalhealth.myfile:myfile:jar
-  #    username: ((NEXUS_USER))
-  #    password: ((NEXUS_PASSWORD))
+  - name: nexus-snapshot
+    type: maven-resource
+    source:
+     url: ((NEXUS_URL))
+     snapshot_url: ((NEXUS_SNAPSHOT_URL))
+     artifact: com.cardinalhealth:((appName)):jar   # ex: com.cardinalhealth.myfile:myfile:jar
+     username: ((NEXUS_USER))
+     password: ((NEXUS_PASSWORD))
 
 # Internal Nexus resource for security tools
   - name: nexus-security-tools
@@ -161,24 +161,24 @@ jobs:
 
 # Publish Binary to Nexus- We deploy only artifacts that have made it through our quality gate!
 # Retrieve temporary binaries form external repo(S3 Bucket) and push them to Nexus
-# - name: publish-snapshot
-#   plan:
-#   - aggregate:
-#     - get: code-analysis
-#       trigger: true
-#     - get: temp-storage
-#       passed: [qualitygate]
-#     - get: build-version
-#       params: ((VERSION_STRATEGY))  #increment the version- for bumping strategy see https://github.com/concourse/semver-resource#version-bumping-semantics
-#     - get: project-source
-#   - task: publish-snapshot
-#     file: project-source/ci/tasks/publish-snapshot.yml
+- name: publish-snapshot
+  plan:
+  - aggregate:
+    - get: code-analysis
+      trigger: true
+    - get: temp-storage
+      passed: [qualitygate]
+    - get: build-version
+      params: ((VERSION_STRATEGY))  #increment the version- for bumping strategy see https://github.com/concourse/semver-resource#version-bumping-semantics
+    - get: project-source
+  - task: publish-snapshot
+    file: project-source/ci/tasks/publish-snapshot.yml
 
 # upload binary artifact to NExus; a version file must be specified
-  # - put: nexus-snapshot
-  #   params:
-  #    file: deploy-output/((appName)).jar
-  #    version_file: deploy-output/version/number
+  - put: nexus-snapshot
+    params:
+     file: deploy-output/((appName)).jar
+     version_file: deploy-output/version/number
 
 # Save current version (on Git file called "number" under "version" folder)
 # Be sure the pipeline run with the right credentials or this step will fail trying to commit the version number
