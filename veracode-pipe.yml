@@ -164,9 +164,9 @@ jobs:
   plan:
   - aggregate:
     - get: temp-storage
-    - get: nexus-security-tools
       passed: [qualitygate]
       trigger: true
+    - get: nexus-security-tools
     trigger: true
   - task: sast-scan
     file: project-source/ci/tasks/veracode-test.yml
