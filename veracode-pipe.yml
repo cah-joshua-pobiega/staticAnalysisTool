@@ -5,6 +5,7 @@ groups:
   - check-dependencies
   - qualitygate
   - publish-snapshot
+  - sast-scan
 
 resource_types:
   # Performs SonarQube analyses and tracks the state of SonarQube quality gates
@@ -158,6 +159,20 @@ jobs:
       trigger: true
   - task: check-sonarqube-quality-gate
     file: project-source/ci/tasks/quality-gate-check.yml
+
+- name: sast-scan
+  plan:
+  - aggregate:
+    - get: temp-storage
+    - get: nexus-security-tools
+      passed: [qualitygate]
+      trigger: true
+    trigger: true
+  - task: sast-scan
+    file: project-source/ci/tasks/veracode-test.yml
+    params:
+      <<: *sonatypeIQ
+
 
 # Publish Binary to Nexus- We deploy only artifacts that have made it through our quality gate!
 # Retrieve temporary binaries form external repo(S3 Bucket) and push them to Nexus
