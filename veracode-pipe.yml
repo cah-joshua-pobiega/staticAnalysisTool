@@ -108,6 +108,7 @@ jobs:
   - get: project-source
     trigger: true
   - get: pipeline-source
+  - get: build-version
   - aggregate:
     - task: build
       file: project-source/ci/tasks/build.yml
