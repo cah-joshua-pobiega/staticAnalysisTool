@@ -168,6 +168,8 @@ jobs:
       passed: [qualitygate]
       trigger: true
     - get: nexus-security-tools
+    - get: project-source
+    - get: build-version
     trigger: true
   - task: sast-scan
     file: project-source/ci/tasks/veracode-test.yml
