@@ -1,22 +1,6 @@
-groups:
-- name: ci-jobs
-  jobs:
-  - build-test-scan
-  - check-dependencies
-  - qualitygate
-  - publish-snapshot
-  - sast-scan
+
 
 resource_types:
-  # Performs SonarQube analyses and tracks the state of SonarQube quality gates
-  # For parameters and usage refer to https://github.com/cathive/concourse-sonarqube-resource
-  - name: sonar-runner
-    type: docker-image
-    source:
-     repository: "nexus-nonprod.cardinalhealth.net:8445/cathive/concourse-sonarqube-resource"
-     tag: ((SONAR-IMAGE-TAG))
-    # For reproducible builds use a specific tag and don't rely on "latest".
-    # Sonarqube URL http://wdil0219apbld15.dev.npch.int:9005/
 
  # maven resource for Nexus Binary repository
   - name: maven-resource
@@ -37,16 +21,6 @@ resources:
       ignore_paths:
       - version/
 
-# # The GIT resource from where to pull the source code
-#   - name: pipeline-source
-#     type: git
-#     source:
-#       uri: ((GIT_PIPELINE_REPO))
-#       branch: ((GIT_BRANCH))
-#       username: ((GIT_USERNAME))
-#       password: ((GIT_PASSWORD))
-#       ignore_paths:
-#       - version/
 
 #Resource used  to store temporary build files, jar, tars, etc
 # Here it uses NExus but it can any resources including external repo such as S3 and GCS
@@ -58,15 +32,7 @@ resources:
      username: ((NEXUS_USER))
      password: ((NEXUS_PASSWORD))
 
-# Resource pointing to the base URL of the SonarQube server instance used
-  - name: code-analysis
-    type: sonar-runner
-    source:
-      host_url: ((SONAR_URL))
-      login: ((SONAR_USER))
-      password: ((SONAR_PASSWORD))
-      #((sonarqube-auth-token))
-      #project_key: com.example.my_project
+
 
 # Internal Nexus resource where to store build/binaries
   - name: nexus-snapshot
@@ -114,68 +80,11 @@ jobs:
       file: project-source/ci/tasks/build.yml
       params:
         <<: *env-params
-    # - task: test-scan
-    #   file: project-source/ci/tasks/unit-test.yml
-    #   params:
-    #     <<: *env-params
-
- # put output in SonarQube resource for static analysis
-  - put: code-analysis
-    params:
-      project_path: sonarqube-analysis-input
-      additional_properties:
-        #Will be passed as "-D<sonar property map> to the -uploadner.
-        <<: *sonar-properties
 
   - put: temp-storage # Upload intermediate build to temp storage
     params:
      file: build-out/((appName))-*.jar
      version_file: build-out/version/number
-
-#dependency and license checks - Secure by Default
-- name: check-dependencies
-  plan:
-  - aggregate:
-    - get: project-source
-    - get: temp-storage
-    - get: nexus-security-tools
-    - get: code-analysis
-      passed: [build-test-scan]
-      trigger: true
-    trigger: true
-  - task: check-dependencies
-    file: project-source/ci/tasks/check-dependencies.yml
-    params:
-      <<: *sonatypeIQ
-
-# Quality Gate- The qualitygate task breaks the build if the analysis result from SonarQube
-# indicates that any of our quality metrics have not been met. Quality metrics are define in Sonarqube
-- name: qualitygate
-  plan:
-  - aggregate:
-    - get: project-source
-    - get: temp-storage
-    - get: code-analysis
-      passed: [check-dependencies]
-      trigger: true
-  - task: check-sonarqube-quality-gate
-    file: project-source/ci/tasks/quality-gate-check.yml
-
-- name: sast-scan
-  plan:
-  - aggregate:
-    - get: temp-storage
-      passed: [qualitygate]
-      trigger: true
-    - get: nexus-security-tools
-    - get: project-source
-    - get: build-version
-    trigger: true
-  - task: sast-scan
-    file: project-source/ci/tasks/veracode-test.yml
-    params:
-      <<: *sonatypeIQ
-
 
 # Publish Binary to Nexus- We deploy only artifacts that have made it through our quality gate!
 # Retrieve temporary binaries form external repo(S3 Bucket) and push them to Nexus
@@ -185,7 +94,7 @@ jobs:
     - get: code-analysis
       trigger: true
     - get: temp-storage
-      passed: [qualitygate]
+      passed: [build-test-scan]
     - get: build-version
       params: ((VERSION_STRATEGY))  #increment the version- for bumping strategy see https://github.com/concourse/semver-resource#version-bumping-semantics
     - get: project-source
