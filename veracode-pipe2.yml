@@ -44,14 +44,14 @@ resources:
      username: ((NEXUS_USER))
      password: ((NEXUS_PASSWORD))
 
-# Internal Nexus resource for security tools
-  - name: nexus-security-tools
-    type: maven-resource
-    source:
-     url: ((NEXUS_SECURITY_URL))
-     artifact: com.cardinalhealth:nexus-iq-cli:jar   # ex: com.cardinalhealth.myfile:myfile:jar
-     username: ((NEXUS_SECURITY_USER))
-     password: ((NEXUS_SECURITY_PASSWORD))
+# # Internal Nexus resource for security tools
+#   - name: nexus-security-tools
+#     type: maven-resource
+#     source:
+#      url: ((NEXUS_SECURITY_URL))
+#      artifact: com.cardinalhealth:nexus-iq-cli:jar   # ex: com.cardinalhealth.myfile:myfile:jar
+#      username: ((NEXUS_SECURITY_USER))
+#      password: ((NEXUS_SECURITY_PASSWORD))
 
 # Concourse native semantic versioning resource; here we use git a a "version" folder
 # For info on usage refer to https://github.com/concourse/semver-resource
