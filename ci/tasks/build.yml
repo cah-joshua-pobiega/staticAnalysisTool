@@ -1,0 +1,22 @@
+platform: linux
+
+image_resource:
+  type: docker-image
+  source: 
+    repository: "nexus-nonprod.cardinalhealth.net:8445/anapsix/alpine-java"
+    tag: 8_jdk 
+inputs:
+  - name: project-source
+  # - name: build-version
+  
+caches:
+  - path: maven
+
+outputs:
+  - name: sonarqube-analysis-input
+  - name: build-out
+run:
+  path: "project-source/ci/tasks/build.sh"
+
+params:
+  TERM: -dumb
