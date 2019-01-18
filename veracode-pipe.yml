@@ -97,8 +97,8 @@ resources:
      file: version/number
      uri: ((GIT_REPO))
      branch: ((GIT_BRANCH))
-     username: ((GIT_USERNAME))
-     password: ((GIT_PASSWORD))
+     username: ((GIT_VERSION_USERNAME))
+     password: ((GIT_VERSION_PASSWORD))
 
 jobs:
 #Pull the source code, run unit test, build a new version ; update version, and run static analysis
