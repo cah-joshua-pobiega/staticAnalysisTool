@@ -95,7 +95,7 @@ resources:
      driver: git
      initial_version: 0.0.1
      file: version/number
-     uri: ((GIT_REPO))
+     uri: ((GIT_VERSION_REPO))
      branch: ((GIT_BRANCH))
      username: ((GIT_VERSION_USERNAME))
      password: ((GIT_VERSION_PASSWORD))
