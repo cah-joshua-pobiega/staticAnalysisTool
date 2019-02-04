@@ -75,26 +75,28 @@ public class Main {
                 }
                 if (uploadFile(uploadAPIWrapper, appID, filePath)){
                     Integer buildID = beginPrescan(uploadAPIWrapper, appID, null, autoScan,"true");
-                    if (buildID != null){
-                        getPreResults = false;
-                        while (!getPreResults){
-                            getPreResults = getPreScanResults(uploadAPIWrapper, appID, buildID);
-                            if (getPreResults) { break;}
-                            TimeUnit.MINUTES.sleep(5);
-                        }
-                            ResultsAPIWrapper resultsAPIWrapper = new ResultsAPIWrapper();
-                            resultsAPIWrapper.setUpApiCredentials(apiID, apiKey);
-                            getSResults = false;
-                            while(!getSResults){
-                                getSResults = getScanResults(resultsAPIWrapper, buildID);
-                                if (getSResults) {break;}
-                                TimeUnit.MINUTES.sleep(5);
-                            }
-                            System.out.println("Results returned.");
-
-
-                    }
+//                    if (buildID != null){
+//                        getPreResults = false;
+//                        while (!getPreResults){
+//                            getPreResults = getPreScanResults(uploadAPIWrapper, appID, buildID);
+//                            if (getPreResults) { break;}
+//                            TimeUnit.MINUTES.sleep(5);
+//                        }
+//                            ResultsAPIWrapper resultsAPIWrapper = new ResultsAPIWrapper();
+//                            resultsAPIWrapper.setUpApiCredentials(apiID, apiKey);
+//                            getSResults = false;
+//                            while(!getSResults){
+//                                getSResults = getScanResults(resultsAPIWrapper, buildID);
+//                                if (getSResults) {break;}
+//                                TimeUnit.MINUTES.sleep(5);
+//                            }
+//                            System.out.println("Scan submitted, please visit the Veracode GUI for scan results.");
+//
+//
+//                    }
                 }
+                System.out.println("Scan submitted, please visit the Veracode GUI for scan results.");
+
 
 
             }
