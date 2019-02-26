@@ -173,12 +173,21 @@ public class Main {
         try {
             String xml = uploadAPIWrapper.uploadFile(String.valueOf(appID), filePath);
             // for debug
-            // System.out.println(xml);
-            String uploadStatus = xmlToJson(xml).getJSONObject("filelist").getJSONObject("file").getString("file_status");
-            if (uploadStatus.equals("Uploaded")) {
-                System.out.println("Application files were uploaded for " + appName + ".");
-                return true;
-            } else throw new IOException("Application files were not uploaded.");
+//            System.out.println("xml: " + xml + "\n");
+            JSONObject filelist = xmlToJson(xml).getJSONObject("filelist");
+            JSONArray uploadStatus = filelist.getJSONArray("file");
+//            System.out.println("filelist: " + filelist + "\n");
+//            System.out.println("uploadStatus: " + uploadStatus + "\n");
+            for (int i = 0; i < uploadStatus.length(); i++) {
+                JSONObject json = uploadStatus.getJSONObject(i);
+                String fileStatus = json.getString("file_status");
+//                System.out.println("fileStatus: " + fileStatus + "\n");
+                if (fileStatus.equals("Uploaded")) {
+                    System.out.println("Application files were uploaded for " + appName + ".");
+                    return true;
+                } else
+                    throw new IOException("Application files were not uploaded.");
+            }
         } catch (IOException e){
             getFileList(uploadAPIWrapper, appID);
             e.printStackTrace();
@@ -236,41 +245,41 @@ public class Main {
 
     private static boolean getFileList(UploadAPIWrapper uploadAPIWrapper, Integer appID) throws java.io.IOException {
         String xml = uploadAPIWrapper.getFileList(String.valueOf(appID));
-        JSONObject check = xmlToJson(xml).getJSONObject("filelist");
-        JSONArray filelist;
-        if (check instanceof JSONObject){
-            filelist = check.toJSONArray(check.names());
-        }
-        else {
-        filelist = xmlToJson(xml).getJSONObject("filelist").getJSONArray("file");
-        }
-        JSONObject json;
+        JSONObject filelist = xmlToJson(xml).getJSONObject("filelist");
+//        System.out.println("Filelist: " + filelist + "\n");
+//        System.out.println("Filelist length: " + filelist.length() + "\n");
+//        if (filelist instanceof JSONObject ) {
+//            filelist = xmlToJson(xml).getJSONObject("filelist");
+//        }
+        JSONArray jFilelist;
+        jFilelist = filelist.getJSONArray("file");
+//        System.out.println("jFilelist: " + jFilelist + "\n");
+//        System.out.println("json length: " + jFilelist.length() + "\n");
 
-        // For debug
-        // System.out.println(filelist);
         try {
-            for (int i = 0; i > filelist.length(); i++) {
-                json = filelist.getJSONObject(i);
+            for (int i = 0; i < jFilelist.length(); i++) {
+                JSONObject json = jFilelist.getJSONObject(i);
+//                System.out.println("json: " + json + "\n");
                 if (!json.has("file_md5")) {
-                    String fileName = json.getJSONObject("file").getString("file_name");
-                    //System.out.println(fileName);
+                    String fileName = json.getString("file_name");
+//                    System.out.println("filename: " + fileName + "\n");
                     String ext = FilenameUtils.getExtension(fileName);
                     if (allowedExtensions.contains(ext)) {
                         System.out.println("Found file " + fileName + ". That may have been leftover from a previous upload." +
                                 " to lower scan time, this file will be removed. Removing " + fileName + "...");
-                        BigInteger fileID = xmlToJson(xml).getJSONObject("filelist").getJSONObject("file").getBigInteger("file_id");
+                        BigInteger fileID = json.getBigInteger("file_id");
+//                        System.out.println("BigInt: " + fileID + "\n");
                         removeFile(uploadAPIWrapper, appID, fileID);
                         System.out.println("Removed.");
-                        return true;
                     } else System.out.println("Last build found, no files to check for...continuing");
-                    return false;
-                } else throw new IOException("Found last build, no files currently uploaded.");
+                        return false;
+                    }
+                else throw new IOException("Found last build, no files currently uploaded.");
             }}
-             catch(IOException e){
+            catch(IOException e){
                 e.printStackTrace();
                 return false;
             }
-
             return false;
     }
 
@@ -304,7 +313,4 @@ public class Main {
             e.printStackTrace();
         }
         return false;
-}
-
-
-}
+}}
