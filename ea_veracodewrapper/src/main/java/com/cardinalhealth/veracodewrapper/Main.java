@@ -153,9 +153,15 @@ public class Main {
         getFileList(uploadAPIWrapper, appID);
         try {
             String xml = uploadAPIWrapper.uploadFile(String.valueOf(appID), filePath);
-            // for debug
             JSONObject filelist = xmlToJson(xml).getJSONObject("filelist");
-            JSONArray uploadStatus = filelist.getJSONArray("file");
+            Object jsonCheck = filelist.get("file");
+            JSONArray uploadStatus = new JSONArray();
+            if (jsonCheck instanceof JSONArray){
+                uploadStatus = filelist.getJSONArray("file");
+            }
+            else {
+                uploadStatus.put(jsonCheck);
+            }
             for (int i = 0; i < uploadStatus.length(); i++) {
                 JSONObject json = uploadStatus.getJSONObject(i);
                 String fileStatus = json.getString("file_status");
@@ -216,18 +222,19 @@ public class Main {
         return null;
     }
 
-    private static JSONObject xmlToJson(String xml){
-        return XML.toJSONObject(xml);
-    }
+    private static JSONObject xmlToJson(String xml){ return XML.toJSONObject(xml); }
 
     private static boolean getFileList(UploadAPIWrapper uploadAPIWrapper, Integer appID) throws java.io.IOException {
         String xml = uploadAPIWrapper.getFileList(String.valueOf(appID));
         JSONObject filelist = xmlToJson(xml).getJSONObject("filelist");
-
-        JSONArray jFilelist;
-        jFilelist = filelist.getJSONArray("file");
-
-
+        Object jsonCheck = filelist.get("file");
+        JSONArray jFilelist = new JSONArray();
+        if (jsonCheck instanceof JSONArray) {
+            jFilelist = filelist.getJSONArray("file");
+        }
+        else {
+            jFilelist.put(jsonCheck);
+        }
         try {
             for (int i = 0; i < jFilelist.length(); i++) {
                 JSONObject json = jFilelist.getJSONObject(i);
